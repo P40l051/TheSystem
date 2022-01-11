@@ -91,6 +91,11 @@ describe("TheSystem", function () {
       await expect(contract.connect(addr1).setMaxSupply(1000))
         .to.be.revertedWith("Ownable: caller is not the owner")
     })
+    it("setMaxSupply should REVERT if amount <= maxSupply", async () => {
+      await contract.setMaxSupply(1000);
+      await expect(contract.setMaxSupply(800))
+        .to.be.revertedWith("Revert: amount too small")
+    })
   })
 
   describe('mint', () => {
@@ -297,6 +302,14 @@ describe("TheSystem", function () {
       await contract.connect(addr2).safeTransferFrom(addr1.address, addr2.address, id, owned, [])
       expect(await contract.balanceOf(addr2.address, id)).to.equal(owned)
     })
+    it("safeTransferFrom REVERT if called by others not approved (addr2 can not not trasfers on behalf of addr1)", async () => {
+      await contract.activateBatch([id]);
+      await contract.setMaxSupply(maxSupply);
+      await contract.connect(addr1).mint(addr1.address, id, 2 * owned, [])
+      await contract.connect(addr1).burn(addr1.address, id, owned)
+      await expect(contract.connect(addr2).safeTransferFrom(addr1.address, addr2.address, id, owned, []))
+        .to.be.revertedWith("ERC1155: caller is not owner");
+    })
     it("safeTransferFrom REVERT if not enough token", async () => {
       await contract.activateBatch([id]);
       await contract.setMaxSupply(maxSupply);
@@ -312,6 +325,15 @@ describe("TheSystem", function () {
       await contract.burn(owner.address, id, owned - 1)
       await expect(contract.safeTransferFrom(owner.address, addr1.address, id, owned, []))
         .to.be.revertedWith("Revert: more _power needed");
+    })
+    it("safeTransferFrom if addr1 has freetranspower < amount and send token to addr2", async () => {
+      await contract.activateBatch([id]);
+      await contract.setMaxSupply(maxSupply);
+      await contract.mint(addr1.address, id, 2 * owned, [])
+      await contract.mint(addr2.address, id, 2 * owned, [])
+      await contract.connect(addr2).burn(addr2.address, id, owned)
+      await contract.connect(addr2).safeTransferFrom(addr2.address, addr1.address, id, 2, [])
+      await contract.connect(addr1).safeTransferFrom(addr1.address, addr2.address, id, 1, [])
     })
     it("safeTransferFrom if addr1 has received X token from addr2, addr2 can send back X tokens without transaction power", async () => {
       await contract.activateBatch([id]);
@@ -400,6 +422,14 @@ describe("TheSystem", function () {
       expect(await contract.balanceOf(addr2.address, id1)).to.equal(owned1)
       expect(await contract.balanceOf(addr2.address, id2)).to.equal(owned2)
     })
+    it("safeBatchTransferFrom REVERT called by others if not approved", async () => {
+      await contract.setMaxSupply(maxSupply);
+      await contract.activateBatch([id1, id2]);
+      await contract.mintBatch(addr1.address, [id1, id2], [2 * owned1, 2 * owned2], [])
+      await contract.connect(addr1).burnBatch(addr1.address, [id1, id2], [owned1, owned2])
+      await expect(contract.connect(addr2).safeBatchTransferFrom(addr1.address, addr2.address, [id1, id2], [owned1, owned2], []))
+        .to.be.revertedWith("ERC1155: caller is not owner");
+    })
     it("safeBatchTransferFrom REVERT if not enough token", async () => {
       await contract.setMaxSupply(maxSupply);
       await contract.activateBatch([id1, id2]);
@@ -415,6 +445,15 @@ describe("TheSystem", function () {
       await contract.connect(addr1).burnBatch(addr1.address, [id1, id2], [owned1, owned2 - 1])
       await expect(contract.connect(addr1).safeBatchTransferFrom(addr1.address, addr2.address, [id1, id2], [owned1, owned2], []))
         .to.be.revertedWith("Revert: more _power needed");
+    })
+    it("safeBatchTransferFrom if addr1 has freetranspower < amount and send token to addr2", async () => {
+      await contract.setMaxSupply(maxSupply);
+      await contract.activateBatch([id1, id2]);
+      await contract.mintBatch(addr1.address, [id2, id2], [2 * owned1, 2 * owned2], [])
+      await contract.mintBatch(addr2.address, [id2, id2], [2 * owned1, 2 * owned2], [])
+      await contract.connect(addr2).burnBatch(addr2.address, [id2, id2], [owned1, 2 * owned2])
+      await contract.connect(addr2).safeBatchTransferFrom(addr2.address, addr1.address, [id2, id2], [2, 2], [])
+      await contract.connect(addr1).safeBatchTransferFrom(addr1.address, addr2.address, [id2, id2], [1, 1], [])
     })
     it("safeBatchTransferFrom if addr1 has received X token from addr2, addr2 can send back X tokens without transaction power", async () => {
       await contract.setMaxSupply(maxSupply);
