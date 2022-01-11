@@ -24,6 +24,11 @@ $ npm install
 ```
 
 ## How To Use
+* Create a file .env in the main directory simlar to .env.example with your environment variables.
+
+* To get RPC urls, if you dont run your own node, go to <a href="https://www.alchemy.com/" target="_blank">Alchemy</a> or <a href="https://infura.io/" target="_blank">Infura</a>.
+
+* To upload images to IPFS you need NFTSTORAGE_API_KEY from <a href="https://nft.storage/" target="_blank">NFT STORAGE</a>
 
 Try running some of the following tasks:
 ```shell
