@@ -41,6 +41,10 @@ describe("TheSystem", function () {
       await contract.setBaseURI(uri)
       expect(await contract.uri(1)).to.equal(uri + "1.json")
     })
+    it("test uri when id=0 is passed", async () => {
+      await contract.setBaseURI(uri)
+      expect(await contract.uri(0)).to.equal(uri + "0.json")
+    })
     it("setBaseURI should REVERT if not called by owner", async () => {
       await expect(contract.connect(addr1).setBaseURI("paolo"))
         .to.be.revertedWith("Ownable: caller is not the owner")
