@@ -1,0 +1,53 @@
+type Account @entity {
+	id: ID!
+	balances: [Balance!]! @derivedFrom(field: "account")
+	transferFromEvent: [Transfer!]! @derivedFrom(field: "from")
+	transferToEvent: [Transfer!]! @derivedFrom(field: "to")
+	transferOperatorEvent: [Transfer!]! @derivedFrom(field: "operator")
+	events: [Event!]! @derivedFrom(field: "emitter")
+}
+
+type Token @entity {
+	id: ID!
+	identifier: BigInt!
+	uri: String
+	totalSupply: Balance!
+	balances: [Balance!]! @derivedFrom(field: "token")
+	transfers: [Transfer!]! @derivedFrom(field: "token")
+}
+type Balance @entity{
+	id: ID!
+	token: Token!
+	account: Account
+	value: BigDecimal!
+	valueExact: BigInt!
+	transferFromEvent: [Transfer!]! @derivedFrom(field: "fromBalance")
+	transferToEvent: [Transfer!]! @derivedFrom(field: "toBalance")
+}
+type Transfer implements Event @entity {
+	id: ID!
+	emitter: Account!
+	transaction: Transaction!
+	timestamp: BigInt!
+	token: Token!
+	operator: Account!
+	from: Account
+	fromBalance: Balance
+	to: Account
+	toBalance: Balance
+	value: BigDecimal!
+  	valueExact: BigInt!
+}
+
+interface Event {
+	id: ID!
+	transaction: Transaction!
+	emitter: Account!
+	timestamp: BigInt!
+}
+type Transaction @entity {
+	id: ID!
+	timestamp: BigInt!
+	blockNumber: BigInt!
+	events: [Event!]! @derivedFrom(field: "transaction")
+}

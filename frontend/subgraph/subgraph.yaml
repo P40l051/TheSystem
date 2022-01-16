@@ -1,0 +1,31 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: TheSystem
+    network: rinkeby
+    source:
+      address: "0x31eda4066B6E258bf56e17A93f17D96DAcDA8cD8"
+      abi: TheSystem
+      startBlock: 9961700
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+      - Account
+      - Token
+      - Balance
+      - Transfer
+      - Event
+      - Transaction
+      abis:
+        - name: TheSystem
+          file: ./abis/TheSystem.json
+      eventHandlers:
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+      file: ./src/mapping.ts
