@@ -8,3 +8,5 @@ data/metadata
 #Hardhat files
 cache
 artifacts
+
+build
