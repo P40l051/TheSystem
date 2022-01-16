@@ -17,6 +17,7 @@
   }
 }
 ```
+
 * All Tokens Exchanged
 ```bash
 {
@@ -30,6 +31,7 @@
   }
 }
 ```
+
 * All Tokens Minted
 ```bash
 {
@@ -46,6 +48,7 @@
   }
 }
 ```
+
 * Token 0x4 analysis
 ```bash
 {
