@@ -1,4 +1,4 @@
-# The System
+# The System Subgraph
 - Try some query on this smart specific smart contract <a href="https://thegraph.com/hosted-service/subgraph/p40l051/the-system" target="_blank">HERE</a>!
 - Find more information about the <a href="https://thegraph.com/en/" target="_blank">The Graph</a>
 
