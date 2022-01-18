@@ -28,4 +28,6 @@ dataSources:
           handler: handleTransferBatch
         - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleTransferSingle
+        - event: ActivateBatch(uint256[])
+          handler: handleActivateBatch
       file: ./src/mapping.ts

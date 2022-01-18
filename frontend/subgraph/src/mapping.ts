@@ -11,6 +11,7 @@ import {
   TheSystem,
   TransferBatch,
   TransferSingle,
+  ActivateBatch
 } from "../generated/TheSystem/TheSystem"
 
 import {
@@ -97,6 +98,15 @@ export function handleTransferBatch(event: TransferBatch): void {
   }
 }
 
+export function handleActivateBatch(event: ActivateBatch): void {
+  let theSystemContractAddress = event.address
+  let ids = event.params._ids
+  for (let i = 0; i < ids.length; ++i) {
+    let token = fetchToken(ids[i], theSystemContractAddress)
+  }
+}
+
+
 export function handleTransferSingle(event: TransferSingle): void {
   let theSystemContractAddress = event.address
   let operator = fetchAccount(event.params.operator)
@@ -120,17 +130,16 @@ export function handleTransferSingle(event: TransferSingle): void {
 export function fetchToken(identifier: BigInt, theSystemContract: Address): Token {
   let id = identifier.toHex()
   let token = Token.load(id)
-
+  let contract = TheSystem.bind(theSystemContract)
   if (token == null) {
     token = new Token(id)
     token.identifier = identifier
-
     token.totalSupply = fetchBalance(token as Token, null).id
+    token.uri = contract.uri(identifier)
     token.save()
   }
 
-  let contract = TheSystem.bind(theSystemContract)
-  token.uri = contract.uri(identifier)
+
 
   return token as Token
 }
