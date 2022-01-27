@@ -95,7 +95,7 @@ export class Total extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("contractAdress", Value.fromString(""));
-    this.set("lastUpdate", Value.fromBigInt(BigInt.zero()));
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("ts", Value.fromBigInt(BigInt.zero()));
     this.set("tm", Value.fromBigInt(BigInt.zero()));
     this.set("tb", Value.fromBigInt(BigInt.zero()));
@@ -137,13 +137,13 @@ export class Total extends Entity {
     this.set("contractAdress", Value.fromString(value));
   }
 
-  get lastUpdate(): BigInt {
-    let value = this.get("lastUpdate");
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
     return value!.toBigInt();
   }
 
-  set lastUpdate(value: BigInt) {
-    this.set("lastUpdate", Value.fromBigInt(value));
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
   }
 
   get ts(): BigInt {

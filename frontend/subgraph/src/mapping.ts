@@ -35,15 +35,40 @@ function registerTransfer(
   : void {
   let token = fetchToken(id, theSystemContract)
   let ev = new Transfer(events.id(event).concat(suffix))
-  let tots = Total.load(theSystemContract.toHexString())
+  let tots = Total.load("last")
   if (tots == null) {
-    tots = new Total(theSystemContract.toHexString())
+    tots = new Total("last")
     tots.contractAdress = theSystemContract.toHexString()
+  }
+  if (event.block.timestamp != tots.timestamp) {
+    let totsl = new Total(event.block.timestamp.toString())
+    totsl.contractAdress = theSystemContract.toHexString()
+    totsl.timestamp = event.block.timestamp
+    if (from.id == constants.ADDRESS_ZERO) {
+      totsl.ts = tots.ts.plus(value)
+      totsl.tm = tots.tm.plus(value)
+      totsl.tb = tots.tb
+      totsl.tt = tots.tt
+    }
+    else if (to.id == constants.ADDRESS_ZERO) {
+      totsl.ts = tots.ts.minus(value)
+      totsl.tm = tots.tm
+      totsl.tb = tots.tb.plus(value)
+      totsl.tt = tots.tt
+    }
+    else if ((from.id != constants.ADDRESS_ZERO) && (to.id != constants.ADDRESS_ZERO)) {
+      totsl.ts = tots.ts
+      totsl.tm = tots.tm
+      totsl.tb = tots.tb
+      totsl.tt = tots.tt.plus(value)
+    }
+    totsl.save()
   }
   ev.emitter = token.id
   ev.transaction = transactions.log(event).id
   ev.timestamp = event.block.timestamp
-  tots.lastUpdate = event.block.timestamp
+  tots.timestamp = event.block.timestamp
+
   ev.token = token.id
   ev.operator = operator.id
   ev.value = decimals.toDecimals(value)
@@ -85,7 +110,6 @@ function registerTransfer(
   }
   if ((from.id != constants.ADDRESS_ZERO) && (to.id != constants.ADDRESS_ZERO)) {
     tots.tt = tots.tt.plus(value)
-
   }
   tots.save()
   token.save()

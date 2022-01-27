@@ -10,7 +10,7 @@ type Account @entity {
 type Total @entity {
 	id: ID!
 	contractAdress:String!
-	lastUpdate: BigInt!
+	timestamp: BigInt!
 	ts:BigInt!
 	tm:BigInt!
 	tb:BigInt!
