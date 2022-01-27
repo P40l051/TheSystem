@@ -20,6 +20,7 @@ dataSources:
       - Transfer
       - Event
       - Transaction
+      - Total
       abis:
         - name: TheSystem
           file: ./abis/TheSystem.json

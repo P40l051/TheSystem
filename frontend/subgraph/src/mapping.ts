@@ -19,7 +19,8 @@ import {
   Token,
   Balance,
   Transfer,
-  Transaction
+  Transaction,
+  Total
 } from "../generated/schema"
 
 function registerTransfer(
@@ -34,9 +35,15 @@ function registerTransfer(
   : void {
   let token = fetchToken(id, theSystemContract)
   let ev = new Transfer(events.id(event).concat(suffix))
+  let tots = Total.load(theSystemContract.toHexString())
+  if (tots == null) {
+    tots = new Total(theSystemContract.toHexString())
+    tots.contractAdress = theSystemContract.toHexString()
+  }
   ev.emitter = token.id
   ev.transaction = transactions.log(event).id
   ev.timestamp = event.block.timestamp
+  tots.lastUpdate = event.block.timestamp
   ev.token = token.id
   ev.operator = operator.id
   ev.value = decimals.toDecimals(value)
@@ -45,14 +52,16 @@ function registerTransfer(
   if (from.id == constants.ADDRESS_ZERO) {
     let totalSupply = fetchBalance(token, null)
     totalSupply.valueExact = totalSupply.valueExact.plus(value)
+    tots.ts = tots.ts.plus(value)
+    tots.tm = tots.tm.plus(value)
     totalSupply.value = decimals.toDecimals(totalSupply.valueExact)
     totalSupply.save()
+
   } else {
     let balance = fetchBalance(token, from)
     balance.valueExact = balance.valueExact.minus(value)
     balance.value = decimals.toDecimals(balance.valueExact)
     balance.save()
-
     ev.from = from.id
     ev.fromBalance = balance.id
   }
@@ -60,8 +69,11 @@ function registerTransfer(
   if (to.id == constants.ADDRESS_ZERO) {
     let totalSupply = fetchBalance(token, null)
     totalSupply.valueExact = totalSupply.valueExact.minus(value)
+    tots.ts = tots.ts.minus(value)
+    tots.tb = tots.tb.plus(value)
     totalSupply.value = decimals.toDecimals(totalSupply.valueExact)
     totalSupply.save()
+
   } else {
     let balance = fetchBalance(token, to)
     balance.valueExact = balance.valueExact.plus(value)
@@ -71,7 +83,11 @@ function registerTransfer(
     ev.to = to.id
     ev.toBalance = balance.id
   }
+  if ((from.id != constants.ADDRESS_ZERO) && (to.id != constants.ADDRESS_ZERO)) {
+    tots.tt = tots.tt.plus(value)
 
+  }
+  tots.save()
   token.save()
   ev.save()
 }

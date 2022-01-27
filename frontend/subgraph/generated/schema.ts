@@ -89,6 +89,100 @@ export class Account extends Entity {
   }
 }
 
+export class Total extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("contractAdress", Value.fromString(""));
+    this.set("lastUpdate", Value.fromBigInt(BigInt.zero()));
+    this.set("ts", Value.fromBigInt(BigInt.zero()));
+    this.set("tm", Value.fromBigInt(BigInt.zero()));
+    this.set("tb", Value.fromBigInt(BigInt.zero()));
+    this.set("tt", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Total entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Total entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Total", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Total | null {
+    return changetype<Total | null>(store.get("Total", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get contractAdress(): string {
+    let value = this.get("contractAdress");
+    return value!.toString();
+  }
+
+  set contractAdress(value: string) {
+    this.set("contractAdress", Value.fromString(value));
+  }
+
+  get lastUpdate(): BigInt {
+    let value = this.get("lastUpdate");
+    return value!.toBigInt();
+  }
+
+  set lastUpdate(value: BigInt) {
+    this.set("lastUpdate", Value.fromBigInt(value));
+  }
+
+  get ts(): BigInt {
+    let value = this.get("ts");
+    return value!.toBigInt();
+  }
+
+  set ts(value: BigInt) {
+    this.set("ts", Value.fromBigInt(value));
+  }
+
+  get tm(): BigInt {
+    let value = this.get("tm");
+    return value!.toBigInt();
+  }
+
+  set tm(value: BigInt) {
+    this.set("tm", Value.fromBigInt(value));
+  }
+
+  get tb(): BigInt {
+    let value = this.get("tb");
+    return value!.toBigInt();
+  }
+
+  set tb(value: BigInt) {
+    this.set("tb", Value.fromBigInt(value));
+  }
+
+  get tt(): BigInt {
+    let value = this.get("tt");
+    return value!.toBigInt();
+  }
+
+  set tt(value: BigInt) {
+    this.set("tt", Value.fromBigInt(value));
+  }
+}
+
 export class Token extends Entity {
   constructor(id: string) {
     super();

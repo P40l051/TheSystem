@@ -7,6 +7,16 @@ type Account @entity {
 	events: [Event!]! @derivedFrom(field: "emitter")
 }
 
+type Total @entity {
+	id: ID!
+	contractAdress:String!
+	lastUpdate: BigInt!
+	ts:BigInt!
+	tm:BigInt!
+	tb:BigInt!
+	tt:BigInt!
+}
+
 type Token @entity {
 	id: ID!
 	identifier: BigInt!
