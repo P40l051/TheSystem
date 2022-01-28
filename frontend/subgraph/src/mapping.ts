@@ -35,34 +35,53 @@ function registerTransfer(
   : void {
   let token = fetchToken(id, theSystemContract)
   let ev = new Transfer(events.id(event).concat(suffix))
-  let tots = Total.load("last")
-  if (tots == null) {
-    tots = new Total("last")
-    tots.contractAdress = theSystemContract.toHexString()
-  }
+  let tots = fetchTotal(null, null)
+  let totsToken = fetchTotal(null, token)
+  tots.contractAdress = theSystemContract.toHexString()
+
   if (event.block.timestamp != tots.timestamp) {
-    let totsl = new Total(event.block.timestamp.toString())
+    let totsl = fetchTotal(event.block.timestamp.toString(), null)
+    let totsTokenl = fetchTotal(event.block.timestamp.toString(), token)
     totsl.contractAdress = theSystemContract.toHexString()
     totsl.timestamp = event.block.timestamp
+    totsTokenl.timestamp = event.block.timestamp
+
     if (from.id == constants.ADDRESS_ZERO) {
       totsl.ts = tots.ts.plus(value)
       totsl.tm = tots.tm.plus(value)
       totsl.tb = tots.tb
       totsl.tt = tots.tt
+
+      totsTokenl.ts = totsToken.ts.plus(value)
+      totsTokenl.tm = totsToken.tm.plus(value)
+      totsTokenl.tb = totsToken.tb
+      totsTokenl.tt = totsToken.tt
+
     }
     else if (to.id == constants.ADDRESS_ZERO) {
       totsl.ts = tots.ts.minus(value)
       totsl.tm = tots.tm
       totsl.tb = tots.tb.plus(value)
       totsl.tt = tots.tt
+
+      totsTokenl.ts = totsToken.ts.minus(value)
+      totsTokenl.tm = totsToken.tm
+      totsTokenl.tb = totsToken.tb.plus(value)
+      totsTokenl.tt = totsToken.tt
     }
     else if ((from.id != constants.ADDRESS_ZERO) && (to.id != constants.ADDRESS_ZERO)) {
       totsl.ts = tots.ts
       totsl.tm = tots.tm
       totsl.tb = tots.tb
       totsl.tt = tots.tt.plus(value)
+
+      totsTokenl.ts = totsToken.ts
+      totsTokenl.tm = totsToken.tm
+      totsTokenl.tb = totsToken.tb
+      totsTokenl.tt = totsToken.tt.plus(value)
     }
     totsl.save()
+    totsTokenl.save()
   }
   ev.emitter = token.id
   ev.transaction = transactions.log(event).id
@@ -79,6 +98,10 @@ function registerTransfer(
     totalSupply.valueExact = totalSupply.valueExact.plus(value)
     tots.ts = tots.ts.plus(value)
     tots.tm = tots.tm.plus(value)
+
+    totsToken.ts = totsToken.ts.plus(value)
+    totsToken.tm = totsToken.tm.plus(value)
+
     totalSupply.value = decimals.toDecimals(totalSupply.valueExact)
     totalSupply.save()
 
@@ -96,6 +119,10 @@ function registerTransfer(
     totalSupply.valueExact = totalSupply.valueExact.minus(value)
     tots.ts = tots.ts.minus(value)
     tots.tb = tots.tb.plus(value)
+
+    totsToken.ts = totsToken.ts.minus(value)
+    totsToken.tb = totsToken.tb.plus(value)
+
     totalSupply.value = decimals.toDecimals(totalSupply.valueExact)
     totalSupply.save()
 
@@ -110,8 +137,10 @@ function registerTransfer(
   }
   if ((from.id != constants.ADDRESS_ZERO) && (to.id != constants.ADDRESS_ZERO)) {
     tots.tt = tots.tt.plus(value)
+    totsToken.tt = totsToken.tt.plus(value)
   }
   tots.save()
+  totsToken.save()
   token.save()
   ev.save()
 }
@@ -198,6 +227,18 @@ export function fetchBalance(token: Token, account: Account | null): Balance {
   }
 
   return balance as Balance
+}
+
+export function fetchTotal(timestamp: String | null, token: Token | null): Total {
+  let id = (timestamp ? timestamp : 'last').concat('/').concat(token ? token.id : 'contract')
+  let total = Total.load(id)
+  if (total == null) {
+    total = new Total(id)
+    total.filter = id
+    total.token = token ? token.id : null
+    total.save()
+  }
+  return total as Total
 }
 
 export function fetchAccount(address: Address): Account {

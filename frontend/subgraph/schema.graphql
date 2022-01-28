@@ -9,7 +9,9 @@ type Account @entity {
 
 type Total @entity {
 	id: ID!
+	filter:String!
 	contractAdress:String!
+	token: Token
 	timestamp: BigInt!
 	ts:BigInt!
 	tm:BigInt!
