@@ -37,12 +37,10 @@ function registerTransfer(
   let ev = new Transfer(events.id(event).concat(suffix))
   let tots = fetchTotal(null, null)
   let totsToken = fetchTotal(null, token)
-  tots.contractAdress = theSystemContract.toHexString()
 
   if (event.block.timestamp != tots.timestamp) {
     let totsl = fetchTotal(event.block.timestamp.toString(), null)
     let totsTokenl = fetchTotal(event.block.timestamp.toString(), token)
-    totsl.contractAdress = theSystemContract.toHexString()
     totsl.timestamp = event.block.timestamp
     totsTokenl.timestamp = event.block.timestamp
 
@@ -51,19 +49,16 @@ function registerTransfer(
       totsl.tm = tots.tm.plus(value)
       totsl.tb = tots.tb
       totsl.tt = tots.tt
-
       totsTokenl.ts = totsToken.ts.plus(value)
       totsTokenl.tm = totsToken.tm.plus(value)
       totsTokenl.tb = totsToken.tb
       totsTokenl.tt = totsToken.tt
-
     }
     else if (to.id == constants.ADDRESS_ZERO) {
       totsl.ts = tots.ts.minus(value)
       totsl.tm = tots.tm
       totsl.tb = tots.tb.plus(value)
       totsl.tt = tots.tt
-
       totsTokenl.ts = totsToken.ts.minus(value)
       totsTokenl.tm = totsToken.tm
       totsTokenl.tb = totsToken.tb.plus(value)
@@ -74,7 +69,6 @@ function registerTransfer(
       totsl.tm = tots.tm
       totsl.tb = tots.tb
       totsl.tt = tots.tt.plus(value)
-
       totsTokenl.ts = totsToken.ts
       totsTokenl.tm = totsToken.tm
       totsTokenl.tb = totsToken.tb
@@ -87,7 +81,6 @@ function registerTransfer(
   ev.transaction = transactions.log(event).id
   ev.timestamp = event.block.timestamp
   tots.timestamp = event.block.timestamp
-
   ev.token = token.id
   ev.operator = operator.id
   ev.value = decimals.toDecimals(value)
@@ -98,13 +91,10 @@ function registerTransfer(
     totalSupply.valueExact = totalSupply.valueExact.plus(value)
     tots.ts = tots.ts.plus(value)
     tots.tm = tots.tm.plus(value)
-
     totsToken.ts = totsToken.ts.plus(value)
     totsToken.tm = totsToken.tm.plus(value)
-
     totalSupply.value = decimals.toDecimals(totalSupply.valueExact)
     totalSupply.save()
-
   } else {
     let balance = fetchBalance(token, from)
     balance.valueExact = balance.valueExact.minus(value)
@@ -113,25 +103,20 @@ function registerTransfer(
     ev.from = from.id
     ev.fromBalance = balance.id
   }
-
   if (to.id == constants.ADDRESS_ZERO) {
     let totalSupply = fetchBalance(token, null)
     totalSupply.valueExact = totalSupply.valueExact.minus(value)
     tots.ts = tots.ts.minus(value)
     tots.tb = tots.tb.plus(value)
-
     totsToken.ts = totsToken.ts.minus(value)
     totsToken.tb = totsToken.tb.plus(value)
-
     totalSupply.value = decimals.toDecimals(totalSupply.valueExact)
     totalSupply.save()
-
   } else {
     let balance = fetchBalance(token, to)
     balance.valueExact = balance.valueExact.plus(value)
     balance.value = decimals.toDecimals(balance.valueExact)
     balance.save()
-
     ev.to = to.id
     ev.toBalance = balance.id
   }
@@ -175,7 +160,6 @@ export function handleActivateBatch(event: ActivateBatch): void {
   }
 }
 
-
 export function handleTransferSingle(event: TransferSingle): void {
   let theSystemContractAddress = event.address
   let operator = fetchAccount(event.params.operator)
@@ -192,9 +176,7 @@ export function handleTransferSingle(event: TransferSingle): void {
     event.params.id,
     event.params.value
   )
-
 }
-
 
 export function fetchToken(identifier: BigInt, theSystemContract: Address): Token {
   let id = identifier.toHex()
@@ -207,9 +189,6 @@ export function fetchToken(identifier: BigInt, theSystemContract: Address): Toke
     token.uri = contract.uri(identifier)
     token.save()
   }
-
-
-
   return token as Token
 }
 
@@ -225,7 +204,6 @@ export function fetchBalance(token: Token, account: Account | null): Balance {
     balance.valueExact = constants.BIGINT_ZERO
     balance.save()
   }
-
   return balance as Balance
 }
 

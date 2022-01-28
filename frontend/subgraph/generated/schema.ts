@@ -95,7 +95,6 @@ export class Total extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("filter", Value.fromString(""));
-    this.set("contractAdress", Value.fromString(""));
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("ts", Value.fromBigInt(BigInt.zero()));
     this.set("tm", Value.fromBigInt(BigInt.zero()));
@@ -136,15 +135,6 @@ export class Total extends Entity {
 
   set filter(value: string) {
     this.set("filter", Value.fromString(value));
-  }
-
-  get contractAdress(): string {
-    let value = this.get("contractAdress");
-    return value!.toString();
-  }
-
-  set contractAdress(value: string) {
-    this.set("contractAdress", Value.fromString(value));
   }
 
   get token(): string | null {
